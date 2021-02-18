@@ -1,7 +1,7 @@
 {
   "name": "weather-journal-app",
   "version": "1.0.0",
-  "description": "## Overview This project requires you to create an asynchronous web app that uses Web API and user data to dynamically update the UI.",
+  "description": "log mood with weather",
   "main": "server.js",
   "dependencies": {
     "body-parser": "^1.19.0",
