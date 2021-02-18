@@ -9,34 +9,30 @@
 </head>
 
 <body>
-  <div id="app">
-    <div class="holder headline">
+  <div class="app">
+    <div class="headline">
       Weather Journal App
     </div>
-    <div class="holder weather">
-      <div class="zip">
-        <label for="zip">Enter Zipcode here</label>
-        <input type="text" id="zip" placeholder="enter zip code here">
-      </div>
-      <div class="weather-display" id="weather">
+    <div class="journal">
 
+      <div class="journal-header">
+        <span id="current-date"></span>
+        <input type="text" class="current-zip" id="current-zip" placeholder="enter zip code here">
+        <span id="current-location"></span>
+        <span id="current-weather"></span>
       </div>
-      
+      <textarea class="journal-body" id="current-content" placeholder="Enter your feelings here" rows="9"
+        cols="50"></textarea>
+      <button class="journal-publish" id="publish" type="submit"> Publish </button>
     </div>
-    <div class="holder feel">
-      <label for="feelings">How are you feeling today?</label>
-      <textarea class="myInput" id="feelings" placeholder="Enter your feelings here" rows="9" cols="50"></textarea>
-      <button id="generate" type="submit"> Generate </button>
-    </div>
-    <div class="holder entry">
-      <div class="title">Most Recent Entry</div>
-      <div id="entryHolder">
-        <div id="date"></div>
-        <div id="temp">
-        </div>
-        <div id="content"></div>
+
+    <div class="history">
+      <div class="history-title">History</div>
+      <div class="history-entries" id="history-entries">
       </div>
     </div>
+  </div>
+
   </div>
   <script src="app.js" type="text/javascript"></script>
 

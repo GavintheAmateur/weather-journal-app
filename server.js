@@ -1,5 +1,7 @@
 // Setup empty JS object to act as endpoint for all routes
-let projectData = {};
+let projectData = {
+    journalEntries:[]
+};
 
 // Require Express to run server and routes
 const express = require('express');
@@ -16,9 +18,6 @@ const cors = require('cors');
 app.use(cors());
 // Initialize the main project folder
 app.use(express.static('website'));
-
-
-
 
 // Setup Server
 const port = 5555;
@@ -38,8 +37,10 @@ const getJournalHandler = (req,resp)=> {
 
 app.get('/all',getJournalHandler);
 // Post Route
-const postJournalHandler = ()=> {
-
+const postJournalHandler = (req,resp)=> {
+    console.log(req)
+    projectData.journalEntries.push(req.body);
+    resp.send(projectData.journalEntries);
 }
 
-app.post('/',postJournalHandler);
+app.post('/journal/save',postJournalHandler);
