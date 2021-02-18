@@ -13,7 +13,7 @@
   "scripts": {
     "test": "",
     "start": "node server.js",
-    "live": "nodemon server.js"
+    "liveload": "nodemon server.js"
   },
   "repository": {
     "type": "git",

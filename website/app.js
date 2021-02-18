@@ -45,16 +45,18 @@ const fetchAndDisplayWeatherAndLocationByZip = e => {
 
     let zip = e.target.value;
     let country = 'us';
-    let url = `${proxyUrl}/${weatherAPIUrl}?zip=${zip},${country}&appid=${weatherAPIAppid}`
-    fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
+    let url = `${weatherAPIUrl}?zip=${zip},${country}&appid=${weatherAPIAppid}`
+    fetch(url
+    //     , {
+    //     method: 'GET',
+    //     mode: 'cors',
+    //     cache: 'no-cache',
+    //     credentials: 'same-origin',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     }
+    // }
+    )
         .then(resp => resp.json())
         .then(data => showWeather(data)
         ).catch(error => console.log(error));

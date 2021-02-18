@@ -23,19 +23,12 @@ app.use(express.static('website'));
 const port = 5555;
 // Callback to debug
 const listening = () => {
-    console.log("hello, I received your message!");
+    console.log(`start listing on ${port}`);
 }
 const server = app.listen(port, listening);
 
 
 
-// Get Route
-const getJournalHandler = (req,resp)=> {
-    console.log(req)
-    resp.send("hello world");
-}
-
-app.get('/all',getJournalHandler);
 // Post Route
 const postJournalHandler = (req,resp)=> {
     console.log(req)

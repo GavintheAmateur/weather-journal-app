@@ -3,8 +3,8 @@
 ## Overview
 This app is an assignment project of Udacity's Frontend Engineer Nanodgree.
 ## Usage
-- Start the app by running `node server.js`  
-- Go to http://localhost:5500/website/index.html  
+- Start the app by running `node start`  
+- Go to http://localhost:5555
 - Enter zip code
 - Enter journal content  
 - Click "Publish"  
