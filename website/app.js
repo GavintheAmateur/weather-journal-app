@@ -8,7 +8,7 @@ const appBaseUrl = 'http://localhost:5555'
 const debug = msg => console.log(msg);
 const logError = err => console.error(err);
 
-const isValidUSZip= (sZip)=> /^\d{5}(-\d{4})?$/.test(sZip);
+const isValidUSZip = (sZip) => /^\d{5}(-\d{4})?$/.test(sZip);
 
 const insertHTML = (parentId, position, html) => document.getElementById(parentId).insertAdjacentHTML(position, html);
 const removeInnerHTML = (id) => document.getElementById(id).innerHTML = '';
@@ -40,7 +40,6 @@ const showWeather = (data) => {
         let desc = data.weather[0].description;
         let weather = `${temp} ℃, ${desc}`;
 
-        let eleLocation = document.getElementById('current-location')
         let country = data.sys.country;
         let city = data.name;
         let location = `${city}, ${country}`;
@@ -63,6 +62,7 @@ const showGettingWeatherFailure = (e) => {
 const loadWeather = async (e) => {
     let zip = e.target.value;
     if (!isValidUSZip(zip)) {
+        removeInnerHTML('location-weather');
         alert(`"${zip}" is not a valid US Zip Code, please re-enter.`);
         return;
     }
@@ -78,35 +78,46 @@ const loadWeather = async (e) => {
         } else {
             showGettingWeatherFailure(data);
         }
-        
+
     } catch (error) {
         showGettingWeatherFailure(error);
     }
 }
 
-const saveJournal = (e) => {
+const saveJournal = async (e) => {
     let id = new Date().getMilliseconds();
     let date = document.getElementById('current-date').textContent;
     //allow user to save without weather and location fetched.
     let zip = document.getElementById('current-zip').value;
     let eleLocation = document.getElementById('current-location');
     let eleWeather = document.getElementById('current-weather');
-    let location = eleLocation?eleLocation.textContent:'';
-    let weather = eleWeather?eleWeather.textContent:'';
+    let location = eleLocation ? eleLocation.textContent : '';
+    let weather = eleWeather ? eleWeather.textContent : '';
     let content = document.getElementById("current-content").value;
 
-    if (zip && content) {
-        let journal = {
-            id: id,
-            date: date,
-            zip: zip,
-            location: location,
-            weather: weather,
-            content, content
-        };
+    if (!zip) {
+        alert("please input zip code before saving!");
+        return;
+    }
 
-        let url = appBaseUrl + '/journal/save'
-        fetch(
+    if (!content) {
+        alert("please input journal content before saving!");
+        return;
+    }
+
+    let journal = {
+        id: id,
+        date: date,
+        zip: zip,
+        location: location,
+        weather: weather,
+        content, content
+    };
+
+    let url = appBaseUrl + '/journals'
+    let resp = null;
+    try {
+        resp = await fetch(
             url,
             {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -116,35 +127,38 @@ const saveJournal = (e) => {
                 },
                 body: JSON.stringify(journal)
             }
-        )
-            .then(resp => resp.json())
-            .then(
-                entries => {
-                    let htmlEntries = entries.sort().reverse().map(
-                        entry => `
+        );
+    }
+    catch (error) {
+        alert(`Saving journal failed with error ${error}!`);
+        return;
+    }
+    if (!resp || resp.status !== 200) {
+        alert(`Saving journal failed with error ${resp}!`);
+        return;
+    }
+    try {
+        resp = await fetch(url);
+        let journals = await resp.json();
+        let htmlJournals = journals.sort().reverse().map(
+            journal => `
                             <div class="history-entry">
                                 <div class="history-entry-header">
-                                <span id="entry-date">${entry.date}</span>
-                                <span id="entry-zip">${entry.zip}</span>
-                                <span id="entry-location">${entry.location}</span>
-                                <span id="entry-weather">${entry.weather}</span>
+                                <span id="entry-date">${journal.date}</span>
+                                <span id="entry-zip">${journal.zip}</span>
+                                <span id="entry-location">${journal.location}</span>
+                                <span id="entry-weather">${journal.weather}</span>
                             </div>
-                            <div class="history-entry-content id="entry-content">${entry.content}</div>
+                            <div class="history-entry-content id="entry-content">${journal.content}</div>
                             </div>
                         `
-                    );
-                    updateInnerHTML('history-entries', htmlEntries);
-
-                })
-            .catch(error => logError(error))
-            ;
-
-    } else if (!zip) {
-        alert("please input zip code before saving!");
-    } else if (!content) {
-        alert("please input journal content before saving!");
+        );
+        updateInnerHTML('history-entries', htmlJournals);
+    } catch (error) {
+        alert(`Getting journals failed with error ${error}!`);
     }
 }
+
 
 //document ready => show date
 document.addEventListener("DOMContentLoaded", showDate);

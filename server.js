@@ -27,13 +27,20 @@ const listening = () => {
 }
 const server = app.listen(port, listening);
 
+// Get Route
+const getAllJournalsHandler = (req,resp)=> {
+    resp.setHeader('Content-Type', 'application/json');
+    resp.send(JSON.stringify(projectData.journalEntries));
+}
+app.get('/journals',getAllJournalsHandler);
+
 // Post Route
 const postJournalHandler = (req,resp)=> {
     console.log(req)
     projectData.journalEntries.push(req.body);
-    resp.send(projectData.journalEntries);
+    resp.sendStatus(200);
 }
-app.post('/journal/save',postJournalHandler);
+app.post('/journals',postJournalHandler);
 
 
 
