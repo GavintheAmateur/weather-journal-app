@@ -27,13 +27,13 @@ const listening = () => {
 }
 const server = app.listen(port, listening);
 
-
-
 // Post Route
 const postJournalHandler = (req,resp)=> {
     console.log(req)
     projectData.journalEntries.push(req.body);
     resp.send(projectData.journalEntries);
 }
-
 app.post('/journal/save',postJournalHandler);
+
+
+

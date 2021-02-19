@@ -12,15 +12,13 @@
   <div class="app">
     <div class="headline">Weather Journal App</div>
     <div class="journal">
-      <div class="journal-header">
-        <span id="current-date"></span>
-        <input type="text" class="current-zip" id="current-zip" placeholder="enter zip code here">
-        <span id="current-location"></span>
-        <span id="current-weather"></span>
+      <div class="journal-header" id="journal-header">
+        <input type="text" class="current-zip" id="current-zip" placeholder="Enter zip code (US only) to get weather">
+        <div id="location-weather"></div>
       </div>
       <textarea class="journal-body" id="current-content" placeholder="Enter your feelings here" rows="9"
         cols="50"></textarea>
-      <button class="journal-publish" id="publish" type="submit"> Publish </button>
+      <button class="journal-save" id="save" type="submit"> Save </button>
     </div>
 
     <div class="history">

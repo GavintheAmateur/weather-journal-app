@@ -1,80 +1,103 @@
-/* Global Variables */
-
+//constants
 const weatherAPIAppid = '0b78a979660e620d1b8ad5f422f0c144';
 const weatherAPIUrl = new URL("https://api.openweathermap.org/data/2.5/weather");
 const proxyUrl = 'https://cors-anywhere.herokuapp.com'
 const appBaseUrl = 'http://localhost:5555'
-/*
-End global variables
-Begin helper functions*/
+
+//helper functions
 const debug = msg => console.log(msg);
-const logAPIError = err => console.error(err);
-/*
-End helper functions.
-Begin business logic:
-*/
+const logError = err => console.error(err);
 
-const showDate = () => {
-    const d = new Date().toLocaleDateString();
-    let eleDate = document.getElementById('current-date');
-    eleDate.textContent = d;
+const isValidUSZip= (sZip)=> /^\d{5}(-\d{4})?$/.test(sZip);
+
+const insertHTML = (parentId, position, html) => document.getElementById(parentId).insertAdjacentHTML(position, html);
+const removeInnerHTML = (id) => document.getElementById(id).innerHTML = '';
+const updateInnerHTML = (id, html) => {
+    removeInnerHTML(id);
+    insertHTML(id, 'beforeend', html);
 }
-const fetchAndDisplayWeatherAndLocationByZip = e => {
-    const showWeather = (resp) => {
-        if (resp) {
-            debug(resp);
 
-            //render weather
-            const absoluteZero = -273.15;
-            let temp = resp.main.temp + absoluteZero;
-            temp = parseFloat(temp).toFixed(1);
-            let weather = resp.weather[0].description;
-            let eleWeather = document.getElementById('current-weather');
-            let h = `${temp} ℃, ${weather}`;
-            eleWeather.textContent = h;
-            //render location
-            let eleLocation = document.getElementById('current-location')
-            let country = resp.sys.country;
-            let city = resp.name;
-            let l = `${city}, ${country}`;
-            eleLocation.textContent = l
-        }
-        //weather api response doc: https://openweathermap.org/current#current_JSON
 
+//business logic
+const showDate = () => {
+    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    let today = new Date().toLocaleDateString('en-US', options);
+    let hToday = `<span id="current-date">${today}</span>`;
+    insertHTML('journal-header', 'afterbegin', hToday);
+}
+
+const showLoadingWeather = () => {
+    let hLoading = `<span id="loading">Loading Weather...</span>`;
+    updateInnerHTML('location-weather', hLoading);
+}
+
+const showWeather = (data) => {
+    //debug(data);
+    if (data) {
+        const absoluteZero = -273.15;
+        let temp = data.main.temp + absoluteZero;
+        temp = parseFloat(temp).toFixed(1);
+        let desc = data.weather[0].description;
+        let weather = `${temp} ℃, ${desc}`;
+
+        let eleLocation = document.getElementById('current-location')
+        let country = data.sys.country;
+        let city = data.name;
+        let location = `${city}, ${country}`;
+
+        let hLocationWeather = `
+        <span id="current-location">${location}</span>
+        <span id="current-weather">${weather}</span>
+        `
+        updateInnerHTML('location-weather', hLocationWeather);
     }
 
-    let zip = e.target.value;
-    let country = 'us';
-    let url = `${weatherAPIUrl}?zip=${zip},${country}&appid=${weatherAPIAppid}`
-    fetch(url
-    //     , {
-    //     method: 'GET',
-    //     mode: 'cors',
-    //     cache: 'no-cache',
-    //     credentials: 'same-origin',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     }
-    // }
-    )
-        .then(resp => resp.json())
-        .then(data => showWeather(data)
-        ).catch(error => console.log(error));
 }
 
-const publishJournal = (e) => {
+const showGettingWeatherFailure = (e) => {
+    console.log(e);
+    let hError = `<span>Getting weather failed. Check console for details.</span>`;
+    updateInnerHTML('location-weather', hError);
+}
 
-    debug("hi")
-    let date = document.getElementById('current-date').textContent;
-    let zip = document.getElementById('current-zip').value;
-    let location = document.getElementById('current-location').textContent;
-    let weather = document.getElementById('current-weather').textContent;
-    let content = document.getElementById('current-content').value;
+const loadWeather = async (e) => {
+    let zip = e.target.value;
+    if (!isValidUSZip(zip)) {
+        alert(`"${zip}" is not a valid US Zip Code, please re-enter.`);
+        return;
+    }
+    let country = 'us';
+    let url = `${weatherAPIUrl}?zip=${zip},${country}&appid=${weatherAPIAppid}`
+    showLoadingWeather();
+    //weather api response doc: https://openweathermap.org/current#current_JSON
+    try {
+        let resp = await fetch(url);
+        let data = await resp.json();
+        if (data.cod == 200) {
+            showWeather(data);
+        } else {
+            showGettingWeatherFailure(data);
+        }
+        
+    } catch (error) {
+        showGettingWeatherFailure(error);
+    }
+}
+
+const saveJournal = (e) => {
     let id = new Date().getMilliseconds();
+    let date = document.getElementById('current-date').textContent;
+    //allow user to save without weather and location fetched.
+    let zip = document.getElementById('current-zip').value;
+    let eleLocation = document.getElementById('current-location');
+    let eleWeather = document.getElementById('current-weather');
+    let location = eleLocation?eleLocation.textContent:'';
+    let weather = eleWeather?eleWeather.textContent:'';
+    let content = document.getElementById("current-content").value;
 
     if (zip && content) {
         let journal = {
-            id:id,
+            id: id,
             date: date,
             zip: zip,
             location: location,
@@ -97,7 +120,6 @@ const publishJournal = (e) => {
             .then(resp => resp.json())
             .then(
                 entries => {
-                    let eleEntries = document.getElementById('history-entries');
                     let htmlEntries = entries.sort().reverse().map(
                         entry => `
                             <div class="history-entry">
@@ -111,33 +133,24 @@ const publishJournal = (e) => {
                             </div>
                         `
                     );
-                    eleEntries.innerHTML='';
-                    htmlEntries.forEach(
-                        h => eleEntries.insertAdjacentHTML('beforeend', h)
-                    );
+                    updateInnerHTML('history-entries', htmlEntries);
 
                 })
-            .catch(error => logAPIError(error))
+            .catch(error => logError(error))
             ;
 
     } else if (!zip) {
-        alert("please input zip code before publishing!");
+        alert("please input zip code before saving!");
     } else if (!content) {
-        alert("please input journal content before publishing!");
+        alert("please input journal content before saving!");
     }
-
-
-
-
-
-
 }
-//onload show date
-document.addEventListener("DOMContentLoaded", showDate);
-//listener to fetch weather 
-const zipBox = document.getElementById('current-zip');
-zipBox.addEventListener('focusout', fetchAndDisplayWeatherAndLocationByZip);
 
-//listner to save journal
-const generateBtn = document.getElementById('publish');
-generateBtn.addEventListener('click', publishJournal);
+//document ready => show date
+document.addEventListener("DOMContentLoaded", showDate);
+//input zip =>   load weather
+const zipBox = document.getElementById('current-zip');
+zipBox.addEventListener('focusout', loadWeather);
+//click save => save journal
+const generateBtn = document.getElementById('save');
+generateBtn.addEventListener('click', saveJournal);

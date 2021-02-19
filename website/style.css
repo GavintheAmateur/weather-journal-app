@@ -31,22 +31,28 @@ body {
 }
 
 .journal-header {
+    width: 80%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     margin: 1rem;
 }
 
-.journal-header * {
-    margin: 1rem;
+.current-zip {
+    width:15rem;
+}
+.location-weather {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    color:#b57edc;
 }
 
 .journal-content {
     width: 90%;
 }
 
-
-.journal-publish {
+.journal-save {
     color: skyblue;
 }
 
@@ -76,8 +82,6 @@ button {
     box-shadow: 2px 4px 5px skyblue;
     margin: 1rem auto;
 }
-
-
 
 ::placeholder {
     /* Chrome, Firefox, Opera, Safari 10.1+ */

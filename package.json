@@ -6,20 +6,22 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "nodemon":"latest"
+    "express": "^4.17.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "nodemon": "latest"
+  },
   "scripts": {
-    "test": "",
+    "test": "node tests.js",
     "start": "node server.js",
-    "liveload": "nodemon server.js"
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GavintheAmateur/weather-journal-app.git"
   },
-  "author": "",
+  "author": "GavinTheAmateur",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/GavintheAmateur/weather-journal-app/issues"
